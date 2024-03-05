@@ -1,6 +1,9 @@
 package org.tinylog.benchmarks.logging.rainbowgum;
 
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.ServiceLoader;
 
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -8,17 +11,18 @@ import org.openjdk.jmh.annotations.State;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.tinylog.benchmarks.logging.AbstractLifeCycle;
+import org.tinylog.benchmarks.logging.LocationInfo;
 
+import io.jstach.rainbowgum.LogConfig;
+import io.jstach.rainbowgum.LogProperties;
+import io.jstach.rainbowgum.LogProperties.MutableLogProperties;
 import io.jstach.rainbowgum.LogPublisher.PublisherFactory;
-import io.jstach.rainbowgum.LogRouter;
-import io.jstach.rainbowgum.LogRouter.Route;
-import io.jstach.rainbowgum.LogRouter.Router;
-import io.jstach.rainbowgum.LogEvent;
 import io.jstach.rainbowgum.RainbowGum;
 import io.jstach.rainbowgum.output.FileOutput;
 import io.jstach.rainbowgum.output.FileOutputBuilder;
 import io.jstach.rainbowgum.pattern.format.PatternEncoderBuilder;
 import io.jstach.rainbowgum.slf4j.RainbowGumSLF4JServiceProvider;
+import io.jstach.rainbowgum.spi.RainbowGumServiceProvider;
 
 @State(Scope.Benchmark)
 public class LifeCycle extends AbstractLifeCycle {
@@ -39,7 +43,25 @@ public class LifeCycle extends AbstractLifeCycle {
 		String fileName = file.toString();
 		FileOutput fileOutput = new FileOutputBuilder("file").fileName(fileName).append(true).build();
 		
-		RainbowGum gum = RainbowGum.builder()
+		boolean changeable = getLocationInfo() == LocationInfo.FULL;
+		
+		/*
+		 * Changeable logger is only configurable with properties at the moment.
+		 */
+		LogProperties props =  ! changeable  ? LogProperties.StandardProperties.EMPTY :  MutableLogProperties.builder()
+				.build()
+				.put("logging.global.change", "true")
+				.put("logging.change", "true");
+		
+		
+		ServiceLoader<RainbowGumServiceProvider> loader = ServiceLoader.load(RainbowGumServiceProvider.class);
+		
+		LogConfig config = LogConfig.builder()
+				.serviceLoader(loader)
+				.properties(props)
+				.build();
+		
+		RainbowGum gum = RainbowGum.builder(config)
 		.route(r -> {
 			r.level(System.Logger.Level.INFO);
 			
@@ -58,7 +80,7 @@ public class LifeCycle extends AbstractLifeCycle {
 					pattern = "%date{yyyy-MM-dd HH:mm:ss} - %thread - %logger - %level: %message%n";
 					break;
 				case FULL:
-					pattern = "%date{yyyy-MM-dd HH:mm:ss} - %thread - "+ name +".output\\(\\) - %level: %message%n";
+					pattern = "%date{yyyy-MM-dd HH:mm:ss} - %thread - %57.57class.%method\\(\\) - %level: %message%n";
 					break;
 				default:
 					throw new IllegalStateException();
@@ -79,15 +101,10 @@ public class LifeCycle extends AbstractLifeCycle {
 		System.out.println(gum.router());
 		
 		RainbowGumSLF4JServiceProvider provider = new RainbowGumSLF4JServiceProvider();
-		System.out.println("before initialize");
 		provider.initialize(gum);
-		System.out.println("after initialize");
 		ILoggerFactory loggerFactory = provider.getLoggerFactory();
 		this.logger = loggerFactory.getLogger(name);
-		System.out.println("after logger - " + this.logger);
 		this.logger.info("blah");
-		System.out.println("test info");
-		System.out.println("async: " + async);
 	}
 	
 	final static String name = 

@@ -174,9 +174,9 @@
     <profile>
       <id>benchmark-agentgt</id>
       <properties>
-        <benchmark.class>.*RainbowGumBenchmark.output|.*Tinylog2Benchmark.output|.*Logback_Benchmark.output</benchmark.class>
-        <benchmark.forks>3</benchmark.forks>
-        <benchmark.iterations>3</benchmark.iterations>
+        <benchmark.class>.*RainbowGumBenchmark.output|.*ITinylog2Benchmark.output|.*ILogback_Benchmark.output</benchmark.class>
+        <benchmark.forks>1</benchmark.forks>
+        <benchmark.iterations>2</benchmark.iterations>
       </properties>
     </profile>
 		<!-- Fast Benchmarks -->

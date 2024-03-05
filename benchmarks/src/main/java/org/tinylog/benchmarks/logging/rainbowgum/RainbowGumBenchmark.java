@@ -16,7 +16,6 @@ public class RainbowGumBenchmark extends AbstractBenchmark<LifeCycle> {
 	@Override
 	public void discard(final LifeCycle lifeCycle) {
 		lifeCycle.logger.debug("Hello {}!", MAGIC_NUMBER);
-		//lifeCycle.debug().message("Hello {}!").arg(MAGIC_NUMBER).log();
 	}
 
 	@Benchmark
