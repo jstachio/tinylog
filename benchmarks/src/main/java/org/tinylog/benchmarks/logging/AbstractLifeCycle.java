@@ -37,7 +37,7 @@ public abstract class AbstractLifeCycle {
 	private volatile long logEntryLength;
 
 	@Param
-	private LocationInfo locationInfo;
+	private LocationInfo locationInfo = LocationInfo.CLASS_OR_CATEGORY_ONLY;
 
 	private Path file;
 

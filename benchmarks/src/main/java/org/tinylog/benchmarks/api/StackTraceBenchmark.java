@@ -83,17 +83,17 @@ public class StackTraceBenchmark {
 		return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();
 	}
 
-	/**
-	 * Benchmarks extracting a class via Sun reflection.
-	 * 
-	 * @return Found class
-	 */
-	@Benchmark
-	@BenchmarkMode(Mode.Throughput)
-	@SuppressWarnings("removal")
-	public Class<?> sunReflection() {
-		return sun.reflect.Reflection.getCallerClass(1);
-	}
+//	/**
+//	 * Benchmarks extracting a class via Sun reflection.
+//	 * 
+//	 * @return Found class
+//	 */
+//	@Benchmark
+//	@BenchmarkMode(Mode.Throughput)
+//	@SuppressWarnings("removal")
+//	public Class<?> sunReflection() {
+//		return sun.reflect.Reflection.getCallerClass(1);
+//	}
 
 	/**
 	 * Benchmarks extracting a stack trace element from stack trace of a throwable.
